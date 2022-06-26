@@ -13,6 +13,7 @@ function createShader(gl, type, source) {
   gl.deleteShader(shader);
 }
 
+//prgram에 shader 연결하는 함수
 function createProgram(gl, vertexShader, fragmentShader) {
   var program = gl.createProgram();
   gl.attachShader(program, vertexShader);
@@ -47,19 +48,26 @@ function main() {
   var program = createProgram(gl, vertexShader, fragmentShader);
 
   // look up where the vertex data needs to go.
+  // 생성된 program의 attribute 위치를 찾는다.
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
   // Create a buffer and put three 2d clip space points in it
+  // attribute는 buffer에서 데이터를 가져오기 때문에 buffer를 생성한다.
   var positionBuffer = gl.createBuffer();
 
   // Bind it to ARRAY_BUFFER (think of it as ARRAY_BUFFER = positionBuffer)
+  // 생성한 buffer를 바인드 포인트를 통해 리소스를 참조한다.
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
+  //자바스크립트 배열인 positions
+  // 2D 포인트 3개
   var positions = [
     0, 0,
     0, 0.5,
     0.7, 0,
   ];
+  //gl.bufferData는 데이터를 GPU의 positionBuffer로 복사한다. 
+  //자바스크립트와 다르게 WebGL은 강력한 타입을 가지는 데이터가 필요하므로, 새로운 32비트 부동 소수점 배열을 생성
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array(positions), gl.STATIC_DRAW);
 
   // code above this line is initialization code.
