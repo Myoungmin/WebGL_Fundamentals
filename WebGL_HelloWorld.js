@@ -76,34 +76,49 @@ function main() {
   webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
   // Tell WebGL how to convert from clip space to pixels
+  // gl_Position으로 설정할 클립 공간 값을 어떻게 화면 공간으로 변환하는지 WebGL에 알려준다.
   gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
   // Clear the canvas
+  // Canvas를 투명하게 지운다.
   gl.clearColor(0, 0, 0, 0);
   gl.clear(gl.COLOR_BUFFER_BIT);
 
   // Tell it to use our program (pair of shaders)
+  // 실행할 shader program을 WebGL에 알려준다.
   gl.useProgram(program);
 
   // Turn on the attribute
+  // gl.getAttribLocation로 찾았던 attribute를 활성화한다.
   gl.enableVertexAttribArray(positionAttributeLocation);
 
+  // 데이터를 어떻게 꺼낼지 설정한다.
+  
   // Bind the position buffer.
   gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
 
+  // attribute는 positionBuffer에 바인딩된다.
   // Tell the attribute how to get data out of positionBuffer (ARRAY_BUFFER)
   var size = 2;          // 2 components per iteration
   var type = gl.FLOAT;   // the data is 32bit floats
   var normalize = false; // don't normalize the data
   var stride = 0;        // 0 = move forward size * sizeof(type) each iteration to get the next position
   var offset = 0;        // start at the beginning of the buffer
+
+  //활성화한 attribute를 파라미터로 넘긴다.
   gl.vertexAttribPointer(
       positionAttributeLocation, size, type, normalize, stride, offset);
 
   // draw
+  // primitiveType을 gl.TRIANGLES로 설정했기 때문에, 정점 셰이더가 3번 실행될 때마다, WebGL은 gl_Position에 설정한 3개의 값을 기반으로 삼각형을 그린다.
   var primitiveType = gl.TRIANGLES;
   var offset = 0;
+  // vertex shader를 3번 실행한다.
   var count = 3;
+
+  // WebGL은 이제 삼각형을 렌더링한다.
+  // 그리려는 모든 픽셀에 대해 WebGL은 fragment shader를 호출한다.
+  // vertex shader가 데이터를 직접 전달하는 것 외에는 아무것도 하지 않는다. 위치 데이터가 이미 클립 공간에 있으므로 할 일이 없다.
   gl.drawArrays(primitiveType, offset, count);
 }
 
