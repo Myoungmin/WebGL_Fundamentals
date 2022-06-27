@@ -1,21 +1,40 @@
 <!doctype html>
 <html>
+
 <head>
   <title>WebGL_Fundamentals</title>
   <meta charset="utf-8">
   <link rel="stylesheet" type="text/css" href="./WebGL_RandomRectangles.css">
 </head>
+
 <body>
-  <h1><a href="../index.html">WebGL</a></h1>
-  <ol>
-    <li><a href="https://github.com/Myoungmin/WebGL_Fundamentals">Git repository</a></li>
-    <li><a href="../HelloWorld/WebGL_HelloWorld.html">WebGL Hello World</a></li>
-    <li><a href="./WebGL_RandomRectangles.html">WebGL Random Rectangles</a></li>
-  </ol>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
   <h2>WebGL Random Rectangles</h2>
   <canvas id="c"></canvas>
   <script id="vertex-shader-2d" type="notjs">
- 
+
     //x, y만 사용하기 때문에 vec2로 수정
     attribute vec2 a_position;
    
@@ -37,8 +56,8 @@
     }
    
   </script>
-  <script  id="fragment-shader-2d" type="notjs">
-    
+  <script id="fragment-shader-2d" type="notjs">
+
     precision mediump float;
 
     uniform vec4 u_color;
@@ -51,4 +70,5 @@
   <script src="../webgl-utils.js"></script>
   <script src="./WebGL_RandomRectangles.js"></script>
 </body>
+
 </html>
