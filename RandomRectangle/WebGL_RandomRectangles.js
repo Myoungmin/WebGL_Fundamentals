@@ -42,7 +42,9 @@ function main() {
   var positionAttributeLocation = gl.getAttribLocation(program, "a_position");
 
   // look up uniform locations
+  // u_resolution이라는 uniform을 추가했기 때문에 uniform의 위치를 찾는 작업을 진행해야 한다.
   var resolutionUniformLocation = gl.getUniformLocation(program, "u_resolution");
+  // u_color라는 uniform을 fragment shader에 추가했기 때문에 uniform의 위치를 찾는 작업을 진행
   var colorUniformLocation = gl.getUniformLocation(program, "u_color");
 
   // Create a buffer to put three 2d clip space points in
@@ -78,15 +80,14 @@ function main() {
   gl.vertexAttribPointer(
       positionAttributeLocation, size, type, normalize, stride, offset);
 
-  // set the resolution
+  // uniform으로 해상도 설정
   gl.uniform2f(resolutionUniformLocation, gl.canvas.width, gl.canvas.height);
 
-  // draw 50 random rectangles in random colors
+  // 임의의 색상으로 임의의 사각형 50개 그리기
   for (var ii = 0; ii < 50; ++ii) {
-    // Setup a random rectangle
-    // This will write to positionBuffer because
-    // its the last thing we bound on the ARRAY_BUFFER
-    // bind point
+    // 임의의 사각형 설정
+    // 초기화 과정에서 수행했던 gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
+    // ARRAY_BUFFER 바인드 포인트에 마지막으로 바인딩한 것이므로 `positionBuffer`에 작성된다. 
     setRectangle(
         gl, randomInt(300), randomInt(300), randomInt(300), randomInt(300));
 
@@ -96,22 +97,26 @@ function main() {
     // Draw the rectangle.
     var primitiveType = gl.TRIANGLES;
     var offset = 0;
+    // 6번 호출
     var count = 6;
     gl.drawArrays(primitiveType, offset, count);
   }
 }
 
-// Returns a random integer from 0 to range - 1.
+// 0부터 -1사이의 임의의 정수 반환.
 function randomInt(range) {
+  //Math.floor() : 소수점 이하를 버림한다.
   return Math.floor(Math.random() * range);
 }
 
-// Fill the buffer with the values that define a rectangle.
+// 사각형을 정의한 값들로 버퍼 채우기
 function setRectangle(gl, x, y, width, height) {
   var x1 = x;
   var x2 = x + width;
   var y1 = y;
   var y2 = y + height;
+  // 참고: gl.bufferData(gl.ARRAY_BUFFER, ...)는 `ARRAY_BUFFER` 바인드 포인트에 바인딩된 버퍼에 영향을 준다.
+  // 버퍼가 두 개 이상이라면 원하는 버퍼를 `ARRAY_BUFFER`에 먼저 바인딩해야 한다.
   gl.bufferData(gl.ARRAY_BUFFER, new Float32Array([
      x1, y1,
      x2, y1,

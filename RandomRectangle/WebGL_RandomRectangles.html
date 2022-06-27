@@ -6,7 +6,7 @@
   <link rel="stylesheet" type="text/css" href="/RandomRectangle/WebGL_RandomRectangles.css">
 </head>
 <body>
-  <h1><a href="index.html">WebGL</a></h1>
+  <h1><a href="/index.html">WebGL</a></h1>
   <ol>
     <li><a href="https://github.com/Myoungmin/WebGL_Fundamentals">Git repository</a></li>
     <li><a href="/HelloWorld/WebGL_HelloWorld.html">WebGL Hello World</a></li>
@@ -14,25 +14,28 @@
   </ol>
   <h2>WebGL Random Rectangles</h2>
   <canvas id="c"></canvas>
-  <script  id="vertex-shader-2d" type="notjs">
-    
+  <script id="vertex-shader-2d" type="notjs">
+ 
+    //x, y만 사용하기 때문에 vec2로 수정
     attribute vec2 a_position;
-
+   
+    //캔버스 해상도를 설정하기 위해 uniform 추가
     uniform vec2 u_resolution;
-    
+   
     void main() {
-       // convert the rectangle from pixels to 0.0 to 1.0
-       vec2 zeroToOne = a_position / u_resolution;
-    
-       // convert from 0->1 to 0->2
-       vec2 zeroToTwo = zeroToOne * 2.0;
-    
-       // convert from 0->2 to -1->+1 (clipspace)
-       vec2 clipSpace = zeroToTwo - 1.0;
-    
-       gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+      // 위치를 픽셀에서 0.0과 1.0사이로 변환
+      vec2 zeroToOne = a_position / u_resolution;
+   
+      // 0->1에서 0->2로 변환
+      vec2 zeroToTwo = zeroToOne * 2.0;
+   
+      // 0->2에서 -1->+1로 변환 (클립 공간)
+      vec2 clipSpace = zeroToTwo - 1.0;
+   
+      // 2D 그래픽 API에서 더 전통적으로 사용되는 좌측 상단 모서리가 되도록 클립 공간 y좌표를 뒤집는다.
+      gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
     }
-    
+   
   </script>
   <script  id="fragment-shader-2d" type="notjs">
     
