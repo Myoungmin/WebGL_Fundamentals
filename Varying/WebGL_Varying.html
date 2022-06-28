@@ -1,0 +1,80 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_Varying.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL Varying</h2>
+  <canvas id="canvas"></canvas>
+  <div id="uiContainer">
+    <div id="ui">
+      <div id="x"></div>
+      <div id="y"></div>
+      <div id="angle"></div>
+      <div id="scaleX"></div>
+      <div id="scaleY"></div>
+    </div>
+  </div>
+
+  <script id="vertex-shader-2d" type="x-shader/x-vertex">
+  attribute vec2 a_position;
+  attribute vec4 a_color;
+  
+  uniform mat3 u_matrix;
+  
+  // fragment shader로 데이터를 전달하기 위해 vertex shader에 varying을 선언한다.
+  varying vec4 v_color;
+  
+  void main() {
+    // 위치에 행렬 곱하기
+    gl_Position = vec4((u_matrix * vec3(a_position, 1)).xy, 0, 1);
+  
+    // attribute에서 varying으로 색상 복사
+    v_color = a_color;
+  }
+  </script>
+  
+  <script id="fragment-shader-2d" type="x-shader/x-fragment">
+  precision mediump float;
+  
+  // vertex shader와 동일한 varying 선언
+  varying vec4 v_color;
+  
+  void main() {
+    gl_FragColor = v_color;
+  }
+  </script>
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="../m3.js"></script>
+  <script src="./WebGL_Varying.js"></script>
+</body>
+
+</html>

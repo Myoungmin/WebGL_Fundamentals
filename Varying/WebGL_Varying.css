@@ -1,0 +1,24 @@
+@import url("../webgl-tutorial.css");
+body {
+    margin: 20px;
+  }
+  canvas {
+    width: 100vw;
+    height: 100vh;
+    display: block;
+  }
+
+  #uiContainer {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 3;
+    font-family: monospace;
+    pointer-events: none;
+  
+    text-shadow:
+     -1px -1px 0 #FFF,
+      1px -1px 0 #FFF,
+      -1px 1px 0 #FFF,
+       1px 1px 0 #FFF;
+  }
