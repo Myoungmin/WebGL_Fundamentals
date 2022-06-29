@@ -31,38 +31,38 @@ function main() {
   // 색상 결정
   setColors(gl);
 
-  var translation = [200, 150];
+  var translation = [400, 300];
   var angleInRadians = 0;
-  var scale = [1, 1];
+  var scale = [2, 2];
 
   drawScene();
 
   // Setup a ui.
-  webglLessonsUI.setupSlider("#x", {value: translation[0], slide: updatePosition(0), max: gl.canvas.width });
-  webglLessonsUI.setupSlider("#y", {value: translation[1], slide: updatePosition(1), max: gl.canvas.height});
-  webglLessonsUI.setupSlider("#angle", {slide: updateAngle, max: 360});
-  webglLessonsUI.setupSlider("#scaleX", {value: scale[0], slide: updateScale(0), min: -5, max: 5, step: 0.01, precision: 2});
-  webglLessonsUI.setupSlider("#scaleY", {value: scale[1], slide: updateScale(1), min: -5, max: 5, step: 0.01, precision: 2});
+  // webglLessonsUI.setupSlider("#x", {value: translation[0], slide: updatePosition(0), max: gl.canvas.width });
+  // webglLessonsUI.setupSlider("#y", {value: translation[1], slide: updatePosition(1), max: gl.canvas.height});
+  // webglLessonsUI.setupSlider("#angle", {slide: updateAngle, max: 360});
+  // webglLessonsUI.setupSlider("#scaleX", {value: scale[0], slide: updateScale(0), min: -5, max: 5, step: 0.01, precision: 2});
+  // webglLessonsUI.setupSlider("#scaleY", {value: scale[1], slide: updateScale(1), min: -5, max: 5, step: 0.01, precision: 2});
 
-  function updatePosition(index) {
-    return function(event, ui) {
-      translation[index] = ui.value;
-      drawScene();
-    };
-  }
+  // function updatePosition(index) {
+  //   return function(event, ui) {
+  //     translation[index] = ui.value;
+  //     drawScene();
+  //   };
+  // }
 
-  function updateAngle(event, ui) {
-    var angleInDegrees = 360 - ui.value;
-    angleInRadians = angleInDegrees * Math.PI / 180;
-    drawScene();
-  }
+  // function updateAngle(event, ui) {
+  //   var angleInDegrees = 360 - ui.value;
+  //   angleInRadians = angleInDegrees * Math.PI / 180;
+  //   drawScene();
+  // }
 
-  function updateScale(index) {
-    return function(event, ui) {
-      scale[index] = ui.value;
-      drawScene();
-    };
-  }
+  // function updateScale(index) {
+  //   return function(event, ui) {
+  //     scale[index] = ui.value;
+  //     drawScene();
+  //   };
+  // }
 
   // Draw the scene.
   function drawScene() {
