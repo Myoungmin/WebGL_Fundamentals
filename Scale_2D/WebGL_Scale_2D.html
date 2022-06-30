@@ -1,0 +1,94 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_Scale_2D.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL 2D : Scale</h2>
+  <canvas id="canvas"></canvas>
+  <div id="uiContainer">
+    <div id="ui">
+      <div id="x"></div>
+      <div id="y"></div>
+      <div id="angle"></div>
+      <div id="scaleX"></div>
+      <div id="scaleY"></div>
+    </div>
+  </div>
+  <!-- vertex shader -->
+  <script id="vertex-shader-2d" type="x-shader/x-vertex">
+attribute vec2 a_position;
+
+uniform vec2 u_resolution;
+uniform vec2 u_translation;
+uniform vec2 u_rotation;
+uniform vec2 u_scale;
+
+void main() {
+  // 위치 스케일링, 스케일로 위치를 곱하면 된다.
+  vec2 scaledPosition = a_position * u_scale;
+
+  // Rotate the position
+  vec2 rotatedPosition = vec2(
+     scaledPosition.x * u_rotation.y + scaledPosition.y * u_rotation.x,
+     scaledPosition.y * u_rotation.y - scaledPosition.x * u_rotation.x);
+
+  // Add in the translation.
+  vec2 position = rotatedPosition + u_translation;
+
+  // convert the position from pixels to 0.0 to 1.0
+  vec2 zeroToOne = position / u_resolution;
+
+  // convert from 0->1 to 0->2
+  vec2 zeroToTwo = zeroToOne * 2.0;
+
+  // convert from 0->2 to -1->+1 (clipspace)
+  vec2 clipSpace = zeroToTwo - 1.0;
+
+  gl_Position = vec4(clipSpace * vec2(1, -1), 0, 1);
+}
+</script>
+  <!-- fragment shader -->
+  <script id="fragment-shader-2d" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec4 u_color;
+
+void main() {
+   gl_FragColor = u_color;
+}
+</script>
+
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="./WebGL_Scale_2D.js"></script>
+</body>
+
+</html>
