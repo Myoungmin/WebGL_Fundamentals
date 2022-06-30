@@ -1,0 +1,104 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_MultipleEffects.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL Image Processing : Multiple Effects</h2>
+  <canvas id="canvas"></canvas>
+  <div id="uiContainer">
+    <div id="ui"></div>
+  </div>
+
+  <script id="vertex-shader-2d" type="x-shader/x-vertex">
+  attribute vec2 a_position;
+  //텍스처 좌표 전달을 위한 attribute
+  attribute vec2 a_texCoord;
+
+  uniform vec2 u_resolution;
+  uniform float u_flipY;
+
+  varying vec2 v_texCoord;
+
+  void main() {
+    // convert the rectangle from pixels to 0.0 to 1.0
+    vec2 zeroToOne = a_position / u_resolution;
+
+    // convert from 0->1 to 0->2
+    vec2 zeroToTwo = zeroToOne * 2.0;
+
+    // convert from 0->2 to -1->+1 (clipspace)
+    vec2 clipSpace = zeroToTwo - 1.0;
+
+    //u_flipY으로 뒤집지 말지 설정
+    gl_Position = vec4(clipSpace * vec2(1, u_flipY), 0, 1);
+
+    // 프래그먼트 셰이더로 텍스처 좌표 전달
+    // GPU는 점들 사이의 값을 보간
+    v_texCoord = a_texCoord;
+  }
+  </script>
+
+  <script id="fragment-shader-2d" type="x-shader/x-fragment">
+  precision mediump float;
+    
+  // our texture
+  uniform sampler2D u_image;
+  uniform vec2 u_textureSize;
+  uniform float u_kernel[9];
+  uniform float u_kernelWeight;
+    
+  // 정점 셰이더에서 전달된 텍스처 좌표
+  varying vec2 v_texCoord;
+    
+  void main() {
+    vec2 onePixel = vec2(1.0, 1.0) / u_textureSize;
+    vec4 colorSum =
+        texture2D(u_image, v_texCoord + onePixel * vec2(-1, -1)) * u_kernel[0] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 0, -1)) * u_kernel[1] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 1, -1)) * u_kernel[2] +
+        texture2D(u_image, v_texCoord + onePixel * vec2(-1,  0)) * u_kernel[3] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 0,  0)) * u_kernel[4] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 1,  0)) * u_kernel[5] +
+        texture2D(u_image, v_texCoord + onePixel * vec2(-1,  1)) * u_kernel[6] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 0,  1)) * u_kernel[7] +
+        texture2D(u_image, v_texCoord + onePixel * vec2( 1,  1)) * u_kernel[8] ;
+  
+    // 합계를 가중치로 나누지만 rgb만을 사용
+    // 알파는 1.0으로 설정
+    gl_FragColor = vec4((colorSum / u_kernelWeight).rgb, 1);
+  }
+  </script>
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="./WebGL_MultipleEffects.js"></script>
+</body>
+
+</html>
