@@ -235,6 +235,8 @@ function render(image) {
   }
   table.appendChild(tbody);
   ui.appendChild(table);
+  // 드래그를 통해 효과를 재정렬하기 위한 jquery 추가하지 않아서 에러가 생겼던 부분
+  // 처음 사진이 표출되지 않다가 체크박스 변경하면 그 이후에 표출되는 에러였다.
   $(table).tableDnD({onDrop: drawEffects});
 
   drawEffects();
