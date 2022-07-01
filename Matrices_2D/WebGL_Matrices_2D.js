@@ -91,14 +91,22 @@ function main() {
     // set the color
     gl.uniform4fv(colorLocation, color);
 
-    // Compute the matrices
+    //// 변환 행렬 묶음을 만들어 uniform으로 넘겨줘서 vertex shader에서 행렬 연산 ////
+
+    // 행렬 계산. vertex에 스케일, 회전, 평행 이동, 투영 순으로 적용한다.
     var matrix = m3.projection(gl.canvas.clientWidth, gl.canvas.clientHeight);
     matrix = m3.translate(matrix, translation[0], translation[1]);
     matrix = m3.rotate(matrix, angleInRadians);
     matrix = m3.scale(matrix, scale[0], scale[1]);
 
-    // Set the matrix.
+    // 원점 이동하는 코드 추가
+    // 변환을 적용하기 전에, 가장 먼저 원점 이동할 행렬을 만들어 적용한다.
+    matrix = m3.translate(matrix, -50, -75);
+
+    // uniform에 행렬을 세팅한다.
     gl.uniformMatrix3fv(matrixLocation, false, matrix);
+
+    //////////////////////////////////////////////////////////////////////////////////
 
     // Draw the geometry.
     var primitiveType = gl.TRIANGLES;
@@ -110,6 +118,8 @@ function main() {
 }
 
 var m3 = {
+  // 투영을 위한 행렬 만들기
+  // width, height를 파라미터로 받아 해상도에 대한 투영 행렬을 생성한다.
   projection: function(width, height) {
     // Note: This matrix flips the Y axis so that 0 is at the top.
     return [
@@ -119,6 +129,7 @@ var m3 = {
     ];
   },
 
+  // 단위 행렬 만들기
   identity: function() {
     return [
       1, 0, 0,
@@ -127,6 +138,7 @@ var m3 = {
     ];
   },
 
+  // 평행 이동을 위한 행렬 만들기
   translation: function(tx, ty) {
     return [
       1, 0, 0,
@@ -135,6 +147,7 @@ var m3 = {
     ];
   },
 
+  //회전을 위한 행렬 만들기
   rotation: function(angleInRadians) {
     var c = Math.cos(angleInRadians);
     var s = Math.sin(angleInRadians);
@@ -145,6 +158,7 @@ var m3 = {
     ];
   },
 
+  // 스케일 행렬 만들기
   scaling: function(sx, sy) {
     return [
       sx, 0, 0,
@@ -153,6 +167,7 @@ var m3 = {
     ];
   },
 
+  //두 행렬을 받아서 곱하고 결과를 반환하는 함수
   multiply: function(a, b) {
     var a00 = a[0 * 3 + 0];
     var a01 = a[0 * 3 + 1];
@@ -185,6 +200,7 @@ var m3 = {
     ];
   },
 
+  // 평행 이동 
   translate: function(m, tx, ty) {
     return m3.multiply(m, m3.translation(tx, ty));
   },

@@ -42,7 +42,7 @@
       <div id="scaleY"></div>
     </div>
   </div>
-  
+
   <!-- vertex shader -->
   <script id="vertex-shader-2d" type="x-shader/x-vertex">
 attribute vec2 a_position;
@@ -51,6 +51,7 @@ uniform mat3 u_matrix;
 
 void main() {
   // Multiply the position by the matrix.
+  // 행렬 연산을 사용하여 이전 셰이더보다 훨씬 간단해졌다.
   gl_Position = vec4((u_matrix * vec3(a_position, 1)).xy, 0, 1);
 }
 </script>
