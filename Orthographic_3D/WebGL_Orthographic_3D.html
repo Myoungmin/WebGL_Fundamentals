@@ -56,7 +56,8 @@ uniform mat4 u_matrix;
 varying vec4 v_color;
 
 void main() {
-  // Multiply the position by the matrix.
+  // 위치에 행렬 곱하기
+  // w의 기본값이 1이기 때문에 따로 설정할 필요가 없다.
   gl_Position = u_matrix * a_position;
 
   // Pass the color to the fragment shader.
