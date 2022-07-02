@@ -162,10 +162,25 @@ function main() {
 
 var m4 = {
 
+  // Perspective를 적용한 이후 3D 객체의 Z를 조정하면 일찍 사라지는 현상을 방지
+  // WebGL은 X와 Y 혹은 +1에서 -1까지 클리핑하는 것처럼 Z도 클리핑을 한다.
+  // Z에 하나의 행렬 연산을 수행하여 원하는 범위를 -1에서 +1사이로 다시 매핑하면 일찍 사라지는 현상을 방지할 수 있다.
+  // fudgeFactor 대신에 fieldOfView를 결정
   perspective: function(fieldOfViewInRadians, aspect, near, far) {
+    // tan(90 - x) = cot(x) = 1 / tan(x)
+    // 1 / tan(0.5 * fieldOfViewInRadians)
     var f = Math.tan(Math.PI * 0.5 - 0.5 * fieldOfViewInRadians);
     var rangeInv = 1.0 / (near - far);
-
+    
+    // 행렬의 값이 결정되는 과정
+    // 1. zNear와 fieldOfView가 주어지면, zNear의 항목이 Z = -1이 되도록필요한 값을 계산한다.
+    // 2. fieldOfView의 절반인 zNear의 위와 아래는 각각 Y = -1과 Y = 1이 된다.
+    // 3. 일반적으로 디스플레이 영역의 width / height로 aspect가 설정되고,  aspect를 이용하여 Y에서 X에 사용할 값을 계산한다.
+    // 4. 마지막으로 zFar의 항목이 Z = 1이 되도록 하기 위해 Z에서 얼마나 크기를 조정할지 알아낸다.
+    
+    //만든 행렬이 하는 역할
+    // 절두체가 클립 공간 안에 있도록 하고 zNear과 zFar를 클립공간의 앞과 뒤로 변환한다.
+    // 각도별로 시야각을 선택한다.
     return [
       f / aspect, 0, 0, 0,
       0, f, 0, 0,
