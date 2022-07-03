@@ -107,7 +107,7 @@ function main() {
     var numFs = 5;
     var radius = 200;
 
-    // Compute the projection matrix
+    // 투영 행렬 계산
     var aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     var zNear = 1;
     var zFar = 2000;
@@ -118,10 +118,12 @@ function main() {
 
     // Use matrix math to compute a position on a circle where
     // the camera is
+    // 원에서 카메라가 있는 위치를 계산한다.
     var cameraMatrix = m4.yRotation(cameraAngleRadians);
     cameraMatrix = m4.translate(cameraMatrix, 0, 0, radius * 1.5);
 
     // Get the camera's position from the matrix we computed
+    // 계산한 행렬에서 카메라 위치 가져오기
     var cameraPosition = [
       cameraMatrix[12],
       cameraMatrix[13],
@@ -131,9 +133,14 @@ function main() {
     var up = [0, 1, 0];
 
     // Compute the camera's matrix using look at.
+    // LookAt을 사용하여 카메라 행렬 계산
     var cameraMatrix = m4.lookAt(cameraPosition, fPosition, up);
 
-    // Make a view matrix from the camera matrix
+    // 카메라 행렬로 뷰 행렬 만들기
+    // "뷰 행렬"는 마치 카메라가 원점(0,0,0)에 있는 것처럼, 모든 걸 카메라와 정반대로 움직여 사실상 카메라를 기준으로 만드는 행렬이다.
+    // 역행렬을 계산하는 inverse 함수를 사용한다.
+    // inverse 함수에 원점을 기준으로 카메라를 어떤 위치와 오리엔테이션으로 옮기는 행렬이 인풋으로 들어가면,
+    // 아웃풋으로 나머지 물체를 움직여 카메라가 원점에 있도록 하는 역행렬이 나오게 된다.
     var viewMatrix = m4.inverse(cameraMatrix);
 
     // Compute a view projection matrix
@@ -160,10 +167,14 @@ function main() {
   }
 }
 
+// 두 벡터를 뺄셈하는 코드
+// cameraPosition에서 target을 빼서 대상에 도달하기 위해 카메라가 이동해야 하는 방향을 가리키는 벡터를 구하는 데 사용된다.
 function subtractVectors(a, b) {
   return [a[0] - b[0], a[1] - b[1], a[2] - b[2]];
 }
 
+// 벡터를 정규화하는 코드 (단위 벡터로 만듦)
+// zAxis를 정규화하는 데 사용한다.
 function normalize(v) {
   var length = Math.sqrt(v[0] * v[0] + v[1] * v[1] + v[2] * v[2]);
   // make sure we don't divide by 0.
@@ -174,6 +185,8 @@ function normalize(v) {
   }
 }
 
+// 두 벡터의 외적을 계산하는 코드
+// 카메라의 xAxis와 yAxis를 구하는 데 사용된다.
 function cross(a, b) {
   return [a[1] * b[2] - a[2] * b[1],
           a[2] * b[0] - a[0] * b[2],
