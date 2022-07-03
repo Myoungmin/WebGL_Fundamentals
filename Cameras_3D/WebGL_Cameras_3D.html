@@ -1,0 +1,75 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_Cameras_3D.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL 3D : Cameras</h2>
+  <canvas id="canvas"></canvas>
+  <div id="uiContainer">
+    <div id="ui">
+      <div id="cameraAngle"></div>
+    </div>
+  </div>
+  <!-- vertex shader -->
+  <script id="vertex-shader-3d" type="x-shader/x-vertex">
+  attribute vec4 a_position;
+  attribute vec4 a_color;
+  
+  uniform mat4 u_matrix;
+  
+  varying vec4 v_color;
+  
+  void main() {
+    // Multiply the position by the matrix.
+    gl_Position = u_matrix * a_position;
+  
+    // Pass the color to the fragment shader.
+    v_color = a_color;
+  }
+  </script>
+  <!-- fragment shader -->
+  <script id="fragment-shader-3d" type="x-shader/x-fragment">
+  precision mediump float;
+  
+  // Passed in from the vertex shader.
+  varying vec4 v_color;
+  
+  void main() {
+     gl_FragColor = v_color;
+  }
+  </script>
+
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="./WebGL_Cameras_3D.js"></script>
+</body>
+
+</html>
