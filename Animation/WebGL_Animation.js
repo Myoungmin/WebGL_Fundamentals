@@ -51,16 +51,17 @@ function main() {
 
   requestAnimationFrame(drawScene);
 
-  // Draw the scene.
+  // requestAnimationFrame은 페이지가 로드된 이후에 호출하면 시간을 파라미터로 보내주기 때문에 now를 파라미터로 받는다.
   function drawScene(now) {
-    // Convert to seconds
+    // 밀리초(1/1000초) 단위로 시간을 전달하기 때문에 초 단위를 얻기 위해 0.001로 곱해야 한다.
     now *= 0.001;
-    // Subtract the previous time from the current time
+    // 현재 시간에서 이전 시간 빼기
     var deltaTime = now - then;
-    // Remember the current time for the next frame.
+    // 다음 프레임을 위해 현재 시간 저장
     then = now;
 
-    // Every frame increase the rotation a little.
+    // 프레임률에 상관없이 초당 rotationSpeed 만큼 회전하도록 설정
+    // rotationSpeed는 1.2고 이는 초당 1.2라디안씩 회전
     rotation[1] += rotationSpeed * deltaTime;
 
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
