@@ -67,28 +67,46 @@ function main() {
   var targetAngleRadians = 0;
   var targetRadius = 300;
   var fieldOfViewRadians = degToRad(60);
+  var rotationSpeed = 1.2;
+  var then = 0;
 
-  drawScene();
+  //drawScene();
+  requestAnimationFrame(drawScene);
 
-  // Setup a ui.
-  webglLessonsUI.setupSlider("#targetAngle", {value: radToDeg(targetAngleRadians), slide: updateTargetAngle, min: -360, max: 360});
-  webglLessonsUI.setupSlider("#targetHeight", {value: target[1], slide: updateTargetHeight, min: 50, max: 300});
+//   // Setup a ui.
+//   webglLessonsUI.setupSlider("#targetAngle", {value: radToDeg(targetAngleRadians), slide: updateTargetAngle, min: -360, max: 360});
+//   webglLessonsUI.setupSlider("#targetHeight", {value: target[1], slide: updateTargetHeight, min: 50, max: 300});
 
-  function updateTargetAngle(event, ui) {
-    targetAngleRadians = degToRad(ui.value);
-    target[0] = Math.sin(targetAngleRadians) * targetRadius;
-    target[2] = Math.cos(targetAngleRadians) * targetRadius;
-    drawScene();
-  }
+//   function updateTargetAngle(event, ui) {
+//     targetAngleRadians = degToRad(ui.value);
+//     target[0] = Math.sin(targetAngleRadians) * targetRadius;
+//     target[2] = Math.cos(targetAngleRadians) * targetRadius;
+//     drawScene();
+//   }
 
-  function updateTargetHeight(event, ui) {
-    target[1] = ui.value;
-    drawScene();
-  }
+//   function updateTargetHeight(event, ui) {
+//     target[1] = ui.value;
+//     drawScene();
+//   }
 
 
   // Draw the scene.
-  function drawScene() {
+  function drawScene(now) {
+    // 밀리초(1/1000초) 단위로 시간을 전달하기 때문에 초 단위를 얻기 위해 0.001로 곱해야 한다.
+    now *= 0.001;
+    // 현재 시간에서 이전 시간 빼기
+    var deltaTime = now - then;
+    // 다음 프레임을 위해 현재 시간 저장
+    then = now;
+
+    // 프레임률에 상관없이 초당 rotationSpeed 만큼 회전하도록 설정
+    // rotationSpeed는 1.2고 이는 초당 1.2라디안씩 회전
+    targetAngleRadians += rotationSpeed * deltaTime;
+
+    target[0] = Math.sin(targetAngleRadians) * targetRadius;
+    target[2] = Math.cos(targetAngleRadians) * targetRadius;
+
+    
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
     // Tell WebGL how to convert from clip space to pixels
@@ -221,6 +239,9 @@ function main() {
     gl.drawArrays(gl.TRIANGLES, 0, numElements_letterF);
  
     ////////////////////////////////////////////////////////////////////////////////////
+
+
+    requestAnimationFrame(drawScene);
   }
 
   function drawHead(matrix, viewProjectionMatrix, matrixLocation, numElements) {
