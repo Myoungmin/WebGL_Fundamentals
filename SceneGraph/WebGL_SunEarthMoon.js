@@ -22,17 +22,19 @@
      this.parent = parent;
    };
 
+   // 부모-자식 관계를 기반으로 지역 행렬에서 월드 행렬을 계산하는 함수
    Node.prototype.updateWorldMatrix = function(parentWorldMatrix) {
      if (parentWorldMatrix) {
-       // a matrix was passed in so do the math
+       // 행렬이 전달되므로 수식을 수행하고 결과를 "this.worldMatrix"에 저장
        m4.multiply(parentWorldMatrix, this.localMatrix, this.worldMatrix);
      } else {
-       // no matrix was passed in so just copy local to world
+       // 행렬이 전달되지 않았으니 "localMatrix"를 "worldMatrix"로 복사
        m4.copy(this.localMatrix, this.worldMatrix);
      }
 
-     // now process all the children
+     // 모든 자식 처리
      var worldMatrix = this.worldMatrix;
+     // 재귀적으로 updateWorldMatrix를 호출한다.
      this.children.forEach(function(child) {
        child.updateWorldMatrix(worldMatrix);
      });
@@ -161,7 +163,7 @@ function main() {
         m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
     // Compute the camera's matrix using look at.
-    var cameraPosition = [0, -200, 0];
+    var cameraPosition = [0, 100, 200];
     var target = [0, 0, 0];
     var up = [0, 0, 1];
     var cameraMatrix = m4.lookAt(cameraPosition, target, up);
@@ -182,7 +184,7 @@ function main() {
     // Update all world matrices in the scene graph
     solarSystemNode.updateWorldMatrix();
 
-    // Compute all the matrices for rendering
+    // 렌더링을 위한 모든 행렬 계산
     objects.forEach(function(object) {
       object.drawInfo.uniforms.u_matrix = m4.multiply(viewProjectionMatrix, object.worldMatrix);
     });
