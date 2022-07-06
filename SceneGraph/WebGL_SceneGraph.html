@@ -33,7 +33,11 @@
 
   <h2>WebGL : Scene Graph</h2>
   <p><a href="https://myoung-min.tistory.com/163" target="_blank">학습내용 블로그 정리</a></p>
+  <h3>Sun, Earth, and Moon</h3>
   <canvas id="canvas"></canvas>
+  <h3>Block Man</h3>
+  <canvas id="canvas_BlockMan"></canvas>
+
 <!-- vertex shader -->
 <script  id="vertex-shader-3d" type="x-shader/x-vertex">
 attribute vec4 a_position;
@@ -66,10 +70,42 @@ void main() {
 }
 </script>
 
+<script  id="vertex-shader-3d-BlockMan" type="x-shader/x-vertex">
+  attribute vec4 a_position;
+  attribute vec4 a_color;
+  
+  uniform mat4 u_matrix;
+  
+  varying vec4 v_color;
+  
+  void main() {
+    // Multiply the position by the matrix.
+    gl_Position = u_matrix * a_position;
+  
+    // Pass the color to the fragment shader.
+    v_color = a_color;
+  }
+  </script>
+  <!-- fragment shader -->
+  <script  id="fragment-shader-3d-BlockMan" type="x-shader/x-fragment">
+  precision mediump float;
+  
+  // Passed in from the vertex shader.
+  varying vec4 v_color;
+  
+  uniform vec4 u_colorMult;
+  uniform vec4 u_colorOffset;
+  
+  void main() {
+     gl_FragColor = v_color * u_colorMult + u_colorOffset;
+  }
+  </script>
+
   <script src="../webgl-utils.js"></script>
   <script src="../m4.js"></script>
   <script src="../primitives.js"></script>
-  <script src="./WebGL_SceneGraph.js"></script>
+  <script src="./WebGL_SunEarthMoon.js"></script>
+  <script src="./WebGL_BlockMan.js"></script>
 </body>
 
 </html>
