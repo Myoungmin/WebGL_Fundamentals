@@ -41,7 +41,8 @@ function main() {
                 new Uint8Array([0, 0, 255, 255]));
   // Asynchronously load an image
   var image = new Image();
-  image.src = "./noodles.jpg";
+  //image.src = "./noodles.jpg";
+  image.src = "./skybox_texture.jpg";
   image.addEventListener('load', function() {
     // Now that the image has loaded make copy it to the texture.
     gl.bindTexture(gl.TEXTURE_2D, texture);
@@ -174,6 +175,7 @@ function main() {
 function setGeometry(gl) {
   var positions = new Float32Array(
     [
+    // back
     -0.5, -0.5,  -0.5,
     -0.5,  0.5,  -0.5,
      0.5, -0.5,  -0.5,
@@ -181,6 +183,7 @@ function setGeometry(gl) {
      0.5,  0.5,  -0.5,
      0.5, -0.5,  -0.5,
 
+     // front
     -0.5, -0.5,   0.5,
      0.5, -0.5,   0.5,
     -0.5,  0.5,   0.5,
@@ -188,6 +191,7 @@ function setGeometry(gl) {
      0.5, -0.5,   0.5,
      0.5,  0.5,   0.5,
 
+     // up
     -0.5,   0.5, -0.5,
     -0.5,   0.5,  0.5,
      0.5,   0.5, -0.5,
@@ -195,6 +199,7 @@ function setGeometry(gl) {
      0.5,   0.5,  0.5,
      0.5,   0.5, -0.5,
 
+     // down
     -0.5,  -0.5, -0.5,
      0.5,  -0.5, -0.5,
     -0.5,  -0.5,  0.5,
@@ -202,6 +207,7 @@ function setGeometry(gl) {
      0.5,  -0.5, -0.5,
      0.5,  -0.5,  0.5,
 
+     // left
     -0.5,  -0.5, -0.5,
     -0.5,  -0.5,  0.5,
     -0.5,   0.5, -0.5,
@@ -209,6 +215,7 @@ function setGeometry(gl) {
     -0.5,   0.5,  0.5,
     -0.5,   0.5, -0.5,
 
+    // right
      0.5,  -0.5, -0.5,
      0.5,   0.5, -0.5,
      0.5,  -0.5,  0.5,
@@ -224,50 +231,109 @@ function setGeometry(gl) {
 function setTexcoords(gl) {
   gl.bufferData(
       gl.ARRAY_BUFFER,
+      // noodles
+      // new Float32Array(
+      //   [
+      //   // select the top left image
+      //   0   , 0  ,
+      //   0   , 0.5,
+      //   0.25, 0  ,
+      //   0   , 0.5,
+      //   0.25, 0.5,
+      //   0.25, 0  ,
+      //   // select the top middle image
+      //   0.25, 0  ,
+      //   0.5 , 0  ,
+      //   0.25, 0.5,
+      //   0.25, 0.5,
+      //   0.5 , 0  ,
+      //   0.5 , 0.5,
+      //   // select to top right image
+      //   0.5 , 0  ,
+      //   0.5 , 0.5,
+      //   0.75, 0  ,
+      //   0.5 , 0.5,
+      //   0.75, 0.5,
+      //   0.75, 0  ,
+      //   // select the bottom left image
+      //   0   , 0.5,
+      //   0.25, 0.5,
+      //   0   , 1  ,
+      //   0   , 1  ,
+      //   0.25, 0.5,
+      //   0.25, 1  ,
+      //   // select the bottom middle image
+      //   0.25, 0.5,
+      //   0.25, 1  ,
+      //   0.5 , 0.5,
+      //   0.25, 1  ,
+      //   0.5 , 1  ,
+      //   0.5 , 0.5,
+      //   // select the bottom right image
+      //   0.5 , 0.5,
+      //   0.75, 0.5,
+      //   0.5 , 1  ,
+      //   0.5 , 1  ,
+      //   0.75, 0.5,
+      //   0.75, 1  ,
+
+      // ]),
+
+
+      // skybox_texture
       new Float32Array(
         [
-        // select the top left image
-        0   , 0  ,
-        0   , 0.5,
-        0.25, 0  ,
-        0   , 0.5,
+        // back       
+        0.25, 0,
+        0.25, 0.25,
+        0.5, 0,
+        0.25, 0.25,
+        0.5, 0.25,
+        0.5, 0,
+
+        // front
+        // 3, 4 일치     
+        0.25, 0.75,
+        0.5, 0.75,
         0.25, 0.5,
-        0.25, 0  ,
-        // select the top middle image
-        0.25, 0  ,
-        0.5 , 0  ,
         0.25, 0.5,
-        0.25, 0.5,
-        0.5 , 0  ,
-        0.5 , 0.5,
-        // select to top right image
-        0.5 , 0  ,
-        0.5 , 0.5,
-        0.75, 0  ,
-        0.5 , 0.5,
+        0.5, 0.75,
+        0.5, 0.5,
+        
+        // up
+        0.25, 0 + 0.25,
+        0.25, 0.25 + 0.25,
+        0.5, 0 + 0.25,
+        0.25, 0.25 + 0.25,
+        0.5, 0.25 + 0.25,
+        0.5, 0 + 0.25,
+
+
+        // down
+        // 3, 4 일치
+        0.25, 0.75 + 0.25,
+        0.5, 0.75 + 0.25,
+        0.25, 0.5 + 0.25,
+        0.25, 0.5 + 0.25,
+        0.5, 0.75 + 0.25,
+        0.5, 0.5 + 0.25,
+        
+        // left
+        0, 0.75,
+        0.25, 0.75,
+        0, 0.5,
+        0.25, 0.75,
+        0.35, 0.5,
+        0, 0.5,
+        
+        // right
+        // 3, 4 일치
+        0.75, 0.75,
         0.75, 0.5,
-        0.75, 0  ,
-        // select the bottom left image
-        0   , 0.5,
-        0.25, 0.5,
-        0   , 1  ,
-        0   , 1  ,
-        0.25, 0.5,
-        0.25, 1  ,
-        // select the bottom middle image
-        0.25, 0.5,
-        0.25, 1  ,
-        0.5 , 0.5,
-        0.25, 1  ,
-        0.5 , 1  ,
-        0.5 , 0.5,
-        // select the bottom right image
-        0.5 , 0.5,
+        0.5, 0.75,
+        0.5, 0.75,
         0.75, 0.5,
-        0.5 , 1  ,
-        0.5 , 1  ,
-        0.75, 0.5,
-        0.75, 1  ,
+        0.5, 0.5,
 
       ]),
       gl.STATIC_DRAW);
