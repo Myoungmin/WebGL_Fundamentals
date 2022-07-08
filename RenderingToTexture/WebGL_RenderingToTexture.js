@@ -62,14 +62,15 @@ function main() {
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   }
 
-  // Create a texture to render to
+  // 먼저 렌더링 대상인 텍스처 생성
   const targetTextureWidth = 256;
   const targetTextureHeight = 256;
   const targetTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
   {
-    // define size and format of level 0
+    // 레벨 0의 크기와 포맷 정의
+    // 어떤 데이터도 제공할 필요가 없어 data를 null로 설정한다.
     const level = 0;
     const internalFormat = gl.RGBA;
     const border = 0;
@@ -80,19 +81,20 @@ function main() {
                   targetTextureWidth, targetTextureHeight, border,
                   format, type, data);
 
-    // set the filtering so we don't need mips
+    // 밉이 필요하지 않도록 필터링 설정
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
     gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
   }
 
-  // Create and bind the framebuffer
+  // 프레임 버퍼 생성 및 바인딩
   const fb = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 
-  // attach the texture as the first color attachment
+  // 첫 번째 색상 어태치먼트로 텍스처 첨부
   const attachmentPoint = gl.COLOR_ATTACHMENT0;
   const level = 0;
+  // 렌더링 대상을 프레임 버퍼 어태치먼트로 설정
   gl.framebufferTexture2D(gl.FRAMEBUFFER, attachmentPoint, gl.TEXTURE_2D, targetTexture, level);
 
   function degToRad(d) {
@@ -108,6 +110,7 @@ function main() {
 
   requestAnimationFrame(drawScene);
 
+  // 텍스처가 캔버스와 다른 종횡비를 가지기 때문에, 투영 행렬을 계산하기 위해서는 매개변수 aspect를 전달
   function drawCube(aspect) {
     // Tell it to use our program (pair of shaders)
     gl.useProgram(program);
@@ -164,7 +167,7 @@ function main() {
     // Set the matrix.
     gl.uniformMatrix4fv(matrixLocation, false, matrix);
 
-    // Tell the shader to use texture unit 0 for u_texture
+    // u_texture에 대해 텍스처 유닛 0을 사용하도록 셰이더에 지시
     gl.uniform1i(textureLocation, 0);
 
     // Draw the geometry.
@@ -190,13 +193,13 @@ function main() {
     gl.enable(gl.DEPTH_TEST);
 
     {
-      // render to our targetTexture by binding the framebuffer
+      // 프레임 버퍼를 바인딩하여 대상 텍스처에 렌더링
       gl.bindFramebuffer(gl.FRAMEBUFFER, fb);
 
-      // render cube with our 3x2 texture
+      // 3x2 텍스처로 큐브 렌더링
       gl.bindTexture(gl.TEXTURE_2D, texture);
 
-      // Tell WebGL how to convert from clip space to pixels
+      // WebGL에 클립 공간에서 픽셀로 변환하는 방법 지시
       gl.viewport(0, 0, targetTextureWidth, targetTextureHeight);
 
       // Clear the attachment(s).
@@ -211,13 +214,13 @@ function main() {
       // render to the canvas
       gl.bindFramebuffer(gl.FRAMEBUFFER, null);
 
-      // render the cube with the texture we just rendered to
+      // 렌더링 대상이었던 텍스처로 큐브 렌더링
       gl.bindTexture(gl.TEXTURE_2D, targetTexture);
 
-      // Tell WebGL how to convert from clip space to pixels
+      // clip space에서 pixels로 변환하는 방법 지시
       gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
 
-      // Clear the canvas AND the depth buffer.
+      // 캔버스와 깊이 버퍼 지우기
       gl.clearColor(1, 1, 1, 1);   // clear to white
       gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
 
