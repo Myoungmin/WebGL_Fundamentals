@@ -151,6 +151,11 @@ function main() {
     // Multiply the matrices.
     var worldViewProjectionMatrix = m4.multiply(viewProjectionMatrix, worldMatrix);
     var worldInverseMatrix = m4.inverse(worldMatrix);
+
+    // 월드 행렬에 스케일링을 적용하면, 
+    // 월드 행렬을 곱하게 될 때 잘못된 법선을 얻게 되는데, 
+    // 이를 방지하기 위해서는 월드 행렬에 조작이 필요하다.
+    // 월드 행렬의 역을 구하고, 열을 행으로 바꾸는 전치를 한 행렬을 법선의 방향을 구하는데 사용한다.
     var worldInverseTransposeMatrix = m4.transpose(worldInverseMatrix);
 
     // Set the matrices
@@ -325,6 +330,7 @@ function setGeometry(gl) {
   gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
 }
 
+// 객체의 법선 정보를 생성한다.
 function setNormals(gl) {
   var normals = new Float32Array([
           // left column front

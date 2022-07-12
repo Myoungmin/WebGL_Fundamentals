@@ -50,10 +50,12 @@ uniform mat4 u_worldInverseTranspose;
 varying vec3 v_normal;
 
 void main() {
-  // Multiply the position by the matrix.
+  // 위치에 행렬 곱하기
   gl_Position = u_worldViewProjection * a_position;
 
-  // orient the normals and pass to the fragment shader
+  // 법선의 방향을 정하고 프래그먼트 셰이더로 전달
+  // 법선이 방향이기 때문에 평행 이동을 고려하지 않는다.
+  // 행렬의 오리엔테이션 부분은 행렬의 상단 3x3 영역에만 있기 때문에 mat3로 곱하게 된다.
   v_normal = mat3(u_worldInverseTranspose) * a_normal;
 }
 </script>
@@ -61,24 +63,22 @@ void main() {
 <script  id="fragment-shader-3d" type="x-shader/x-fragment">
 precision mediump float;
 
-// Passed in from the vertex shader.
+// 정점 셰이더에서 전달됩니다.
 varying vec3 v_normal;
 
 uniform vec3 u_reverseLightDirection;
 uniform vec4 u_color;
 
 void main() {
-  // because v_normal is a varying it's interpolated
-  // so it will not be a unit vector. Normalizing it
-  // will make it a unit vector again
+  // v_normal이 베링이기 때문에 보간되므로 단위 벡터가 아닙니다.
+  // 정규화하면 다시 단위 벡터가 됩니다.
   vec3 normal = normalize(v_normal);
 
   float light = dot(normal, u_reverseLightDirection);
 
   gl_FragColor = u_color;
 
-  // Lets multiply just the color portion (not the alpha)
-  // by the light
+  // 색상 부분(알파 제외)에만 "light" 곱하기
   gl_FragColor.rgb *= light;
 }
 </script>
