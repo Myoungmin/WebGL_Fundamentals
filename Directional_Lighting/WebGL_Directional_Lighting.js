@@ -47,19 +47,38 @@ function main() {
 
   var fieldOfViewRadians = degToRad(60);
   var fRotationRadians = 0;
+  // 애니메이션을 위한 변수
+  var rotationSpeed = 0.5;
+  var then = 0;
 
-  drawScene();
+  // 애이메이션을 위해 requestAnimationFrame 함수 사용
+  //drawScene();
+  requestAnimationFrame(drawScene);
 
-  // Setup a ui.
-  webglLessonsUI.setupSlider("#fRotation", {value: radToDeg(fRotationRadians), slide: updateRotation, min: -360, max: 360});
+  // UI 주석처리
+  // // Setup a ui.
+  // webglLessonsUI.setupSlider("#fRotation", {value: radToDeg(fRotationRadians), slide: updateRotation, min: -360, max: 360});
 
-  function updateRotation(event, ui) {
-    fRotationRadians = degToRad(ui.value);
-    drawScene();
-  }
+  // function updateRotation(event, ui) {
+  //   fRotationRadians = degToRad(ui.value);
+  //   drawScene();
+  // }
 
   // Draw the scene.
-  function drawScene() {
+  function drawScene(now) {
+
+    // 밀리초(1/1000초) 단위로 시간을 전달하기 때문에 초 단위를 얻기 위해 0.001로 곱해야 한다.
+    now *= 0.001;
+    // 현재 시간에서 이전 시간 빼기
+    var deltaTime = now - then;
+    // 다음 프레임을 위해 현재 시간 저장
+    then = now;
+
+    // 프레임률에 상관없이 초당 rotationSpeed 만큼 회전하도록 설정
+    // rotationSpeed는 0.5이고 이는 초당 0.5라디안씩 회전
+    fRotationRadians += rotationSpeed * deltaTime;
+
+
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
     // Tell WebGL how to convert from clip space to pixels
@@ -149,6 +168,9 @@ function main() {
     var offset = 0;
     var count = 16 * 6;
     gl.drawArrays(primitiveType, offset, count);
+
+    // 애니메이션을 위해 drawScene 끝에서 다시 호출
+    requestAnimationFrame(drawScene);
   }
 }
 
