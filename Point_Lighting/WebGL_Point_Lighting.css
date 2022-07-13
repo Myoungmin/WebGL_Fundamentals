@@ -7,3 +7,14 @@ body {
     height: 50vh;
     display: block;
   }
+  .gman-slider-label, .gman-widget-label, .gman-checkbox-label {
+    font-size:large;
+    min-width: 10em;
+    text-align:right;
+  }
+  .gman-widget-value {
+    float: right;
+    font-size: large;
+    order: 1;
+    min-width: 3em;
+  }

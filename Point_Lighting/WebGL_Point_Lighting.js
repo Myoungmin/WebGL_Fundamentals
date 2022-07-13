@@ -52,7 +52,7 @@ function main() {
 
   var fieldOfViewRadians = degToRad(60);
   var fRotationRadians = 0;
-  var shininess = 150;
+  var shininess = 50;
   // 애니메이션을 위한 변수
   var rotationSpeed = 0.5;
   var then = 0;
@@ -64,7 +64,7 @@ function main() {
   // Setup a ui.
   // Rotation 슬라이드 주석
   // webglLessonsUI.setupSlider("#fRotation", {value: radToDeg(fRotationRadians), slide: updateRotation, min: -360, max: 360});
-  webglLessonsUI.setupSlider("#shininess", {value: shininess, slide: updateShininess, min: 1, max: 300});
+  webglLessonsUI.setupSlider("#shininess", {name: "밝기 조절", value: shininess, slide: updateShininess, min: 1, max: 100});
 
   // Rotation 이벤트 핸들러 주석
   // function updateRotation(event, ui) {
