@@ -46,6 +46,7 @@
 attribute vec4 a_position;
 attribute vec3 a_normal;
 
+// 조명의 위치
 uniform vec3 u_lightWorldPosition;
 uniform vec3 u_viewWorldPosition;
 
@@ -59,21 +60,20 @@ varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
 
 void main() {
-  // Multiply the position by the matrix.
+  // 위치에 행렬 곱하기
   gl_Position = u_worldViewProjection * a_position;
 
-  // orient the normals and pass to the fragment shader
+  // 법선의 방향을 정하고 프래그먼트 셰이더로 전달
   v_normal = mat3(u_worldInverseTranspose) * a_normal;
 
-  // compute the world position of the surface
+  // 표면의 월드 위치를 계산하는 방법 : 위치에 월드 행렬을 곱한다.
   vec3 surfaceWorldPosition = (u_world * a_position).xyz;
 
-  // compute the vector of the surface to the light
-  // and pass it to the fragment shader
+  // 표면의 모든 위치에서 조명까지의 벡터를 계산한다.
+  // fragment shader로 넘겨준다.
   v_surfaceToLight = u_lightWorldPosition - surfaceWorldPosition;
 
-  // compute the vector of the surface to the view/camera
-  // and pass it to the fragment shader
+  // 표면 -> 뷰/카메라 벡터를 계산하고 프래그먼트 셰이더로 전달
   v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
 }
 </script>
@@ -81,7 +81,7 @@ void main() {
 <script  id="fragment-shader-3d" type="x-shader/x-fragment">
 precision mediump float;
 
-// Passed in from the vertex shader.
+// 정점 셰이더에서 전달됩니다.
 varying vec3 v_normal;
 varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
@@ -90,9 +90,8 @@ uniform vec4 u_color;
 uniform float u_shininess;
 
 void main() {
-  // because v_normal is a varying it's interpolated
-  // so it will not be a unit vector. Normalizing it
-  // will make it a unit vector again
+  // v_normal은 베링이기 때문에 보간되므로 단위 벡터가 아닙니다.
+  // 정규화하면 다시 단위 벡터가 됩니다.
   vec3 normal = normalize(v_normal);
 
   vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
@@ -101,17 +100,18 @@ void main() {
 
   float light = dot(normal, surfaceToLightDirection);
   float specular = 0.0;
+  // 스칼라곱을 거듭제곱해서 밝기를 수정한다.
   if (light > 0.0) {
+    // 음수를 거듭제곱하는 건 WebGL에 정의되어 있지 않아 스칼라곱이 음수가 된다면 specular를 0.0으로 남겨둔다.
     specular = pow(dot(normal, halfVector), u_shininess);
   }
 
   gl_FragColor = u_color;
 
-  // Lets multiply just the color portion (not the alpha)
-  // by the light
+  // 색상 부분(알파 제외)에만 광량 곱하기
   gl_FragColor.rgb *= light;
 
-  // Just add in the specular
+  // 반사율 더하기
   gl_FragColor.rgb += specular;
 }
 </script>

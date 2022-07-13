@@ -149,7 +149,7 @@ function main() {
     var zFar = 2000;
     var projectionMatrix = m4.perspective(fieldOfViewRadians, aspect, zNear, zFar);
 
-    // Compute the camera's matrix
+    // 카메라 행렬 계산
     var camera = [100, 150, 200];
     var target = [0, 35, 0];
     var up = [0, 1, 0];
@@ -180,10 +180,10 @@ function main() {
     // set the light position
     gl.uniform3fv(lightWorldPositionLocation, [20, 30, 60]);
 
-    // set the camera/view position
+    // 카메라/뷰 위치 설정
     gl.uniform3fv(viewWorldPositionLocation, camera);
 
-    // set the shininess
+    // 광택 설정
     gl.uniform1f(shininessLocation, shininess);
 
     // Draw the geometry.
