@@ -1,0 +1,124 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_Point_Lighting.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL Lighting : Point Lighting</h2>
+  <p><a href="https://myoung-min.tistory.com/170" target="_blank">학습내용 블로그 정리</a></p>
+  <canvas id="canvas"></canvas>
+<div id="uiContainer">
+  <div id="ui">
+    <div id="fRotation"></div>
+    <div id="shininess"></div>
+  </div>
+</div>
+<!-- vertex shader -->
+<script  id="vertex-shader-3d" type="x-shader/x-vertex">
+attribute vec4 a_position;
+attribute vec3 a_normal;
+
+uniform vec3 u_lightWorldPosition;
+uniform vec3 u_viewWorldPosition;
+
+uniform mat4 u_world;
+uniform mat4 u_worldViewProjection;
+uniform mat4 u_worldInverseTranspose;
+
+varying vec3 v_normal;
+
+varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToView;
+
+void main() {
+  // Multiply the position by the matrix.
+  gl_Position = u_worldViewProjection * a_position;
+
+  // orient the normals and pass to the fragment shader
+  v_normal = mat3(u_worldInverseTranspose) * a_normal;
+
+  // compute the world position of the surface
+  vec3 surfaceWorldPosition = (u_world * a_position).xyz;
+
+  // compute the vector of the surface to the light
+  // and pass it to the fragment shader
+  v_surfaceToLight = u_lightWorldPosition - surfaceWorldPosition;
+
+  // compute the vector of the surface to the view/camera
+  // and pass it to the fragment shader
+  v_surfaceToView = u_viewWorldPosition - surfaceWorldPosition;
+}
+</script>
+<!-- fragment shader -->
+<script  id="fragment-shader-3d" type="x-shader/x-fragment">
+precision mediump float;
+
+// Passed in from the vertex shader.
+varying vec3 v_normal;
+varying vec3 v_surfaceToLight;
+varying vec3 v_surfaceToView;
+
+uniform vec4 u_color;
+uniform float u_shininess;
+
+void main() {
+  // because v_normal is a varying it's interpolated
+  // so it will not be a unit vector. Normalizing it
+  // will make it a unit vector again
+  vec3 normal = normalize(v_normal);
+
+  vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
+  vec3 surfaceToViewDirection = normalize(v_surfaceToView);
+  vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
+
+  float light = dot(normal, surfaceToLightDirection);
+  float specular = 0.0;
+  if (light > 0.0) {
+    specular = pow(dot(normal, halfVector), u_shininess);
+  }
+
+  gl_FragColor = u_color;
+
+  // Lets multiply just the color portion (not the alpha)
+  // by the light
+  gl_FragColor.rgb *= light;
+
+  // Just add in the specular
+  gl_FragColor.rgb += specular;
+}
+</script>
+
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="../m4.js"></script>
+  <script src="./WebGL_Point_Lighting.js"></script>
+</body>
+
+</html>
