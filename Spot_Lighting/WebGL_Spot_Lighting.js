@@ -62,42 +62,65 @@ function main() {
   var innerLimit = degToRad(10);
   var outerLimit = degToRad(20);
 
-  drawScene();
+  // 애니메이션을 위한 변수
+  var rotationSpeed = 0.5;
+  var then = 0;
+
+  // 애이메이션을 위해 requestAnimationFrame 함수 사용
+  //drawScene();
+  requestAnimationFrame(drawScene);
 
   // Setup a ui.
   webglLessonsUI.setupSlider("#fRotation", {value: radToDeg(fRotationRadians), slide: updateRotation, min: -360, max: 360});
-  webglLessonsUI.setupSlider("#lightRotationX", {value: lightRotationX, slide: updatelightRotationX, min: -2, max: 2, precision: 2, step: 0.001});
-  webglLessonsUI.setupSlider("#lightRotationY", {value: lightRotationY, slide: updatelightRotationY, min: -2, max: 2, precision: 2, step: 0.001});
+  webglLessonsUI.setupSlider("#lightRotationX", {value: lightRotationX, slide: updatelightRotationX, min: -1, max: 1, precision: 2, step: 0.001});
+  webglLessonsUI.setupSlider("#lightRotationY", {value: lightRotationY, slide: updatelightRotationY, min: -1, max: 1, precision: 2, step: 0.001});
   webglLessonsUI.setupSlider("#innerLimit", {value: radToDeg(innerLimit), slide: updateInnerLimit, min: 0, max: 180});
   webglLessonsUI.setupSlider("#outerLimit", {value: radToDeg(outerLimit), slide: updateOuterLimit, min: 0, max: 180});
 
   function updateRotation(event, ui) {
     fRotationRadians = degToRad(ui.value);
-    drawScene();
+    //drawScene();
+    requestAnimationFrame(drawScene);
   }
 
   function updatelightRotationX(event, ui) {
     lightRotationX = ui.value;
-    drawScene();
+    //drawScene();
+    requestAnimationFrame(drawScene);
   }
 
   function updatelightRotationY(event, ui) {
     lightRotationY = ui.value;
-    drawScene();
+    //drawScene();
+    requestAnimationFrame(drawScene);
   }
 
   function updateInnerLimit(event, ui) {
     innerLimit = degToRad(ui.value);
-    drawScene();
+    //drawScene();
+    requestAnimationFrame(drawScene);
   }
 
   function updateOuterLimit(event, ui) {
     outerLimit = degToRad(ui.value);
-    drawScene();
+    //drawScene();
+    requestAnimationFrame(drawScene);
   }
 
   // Draw the scene.
-  function drawScene() {
+  function drawScene(now) {
+
+    // 밀리초(1/1000초) 단위로 시간을 전달하기 때문에 초 단위를 얻기 위해 0.001로 곱해야 한다.
+    now *= 0.001;
+    // 현재 시간에서 이전 시간 빼기
+    var deltaTime = now - then;
+    // 다음 프레임을 위해 현재 시간 저장
+    then = now;
+
+    // 프레임률에 상관없이 초당 rotationSpeed 만큼 회전하도록 설정
+    fRotationRadians += rotationSpeed * deltaTime;
+
+
     webglUtils.resizeCanvasToDisplaySize(gl.canvas);
 
     // Tell WebGL how to convert from clip space to pixels
@@ -212,6 +235,9 @@ function main() {
     var offset = 0;
     var count = 16 * 6;
     gl.drawArrays(primitiveType, offset, count);
+
+    // 애니메이션을 위해 drawScene 끝에서 다시 호출
+    requestAnimationFrame(drawScene);
   }
 }
 
