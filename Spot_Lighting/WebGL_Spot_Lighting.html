@@ -83,7 +83,7 @@ void main() {
 <script  id="fragment-shader-3d" type="x-shader/x-fragment">
 precision mediump float;
 
-// Passed in from the vertex shader.
+// 정점 셰이더에서 전달된다.
 varying vec3 v_normal;
 varying vec3 v_surfaceToLight;
 varying vec3 v_surfaceToView;
@@ -95,28 +95,29 @@ uniform float u_innerLimit;          // in dot space
 uniform float u_outerLimit;          // in dot space
 
 void main() {
-  // because v_normal is a varying it's interpolated
-  // so it will not be a unit vector. Normalizing it
-  // will make it a unit vector again
+  // v_normal은 베링이기 때문에 보간되므로 단위 벡터가 아닙니다.
+  // 정규화하면 다시 단위 벡터가 됩니다.
   vec3 normal = normalize(v_normal);
 
   vec3 surfaceToLightDirection = normalize(v_surfaceToLight);
   vec3 surfaceToViewDirection = normalize(v_surfaceToView);
   vec3 halfVector = normalize(surfaceToLightDirection + surfaceToViewDirection);
 
-  float dotFromDirection = dot(surfaceToLightDirection,
-                               -u_lightDirection);
+  float dotFromDirection = dot(surfaceToLightDirection, -u_lightDirection);
+  // 두 임계값을 적용하여 조명을 비추는 영역을 계산한다.
+  // 스포트라이트 안에 있다면 "inLight"는 1이 되고 아니라면 0이 된다.
+  // GLSL smoothstep 함수는 Hermite interpolation을 사용한다.
   float inLight = smoothstep(u_outerLimit, u_innerLimit, dotFromDirection);
   float light = inLight * dot(normal, surfaceToLightDirection);
   float specular = inLight * pow(dot(normal, halfVector), u_shininess);
 
   gl_FragColor = u_color;
 
-  // Lets multiply just the color portion (not the alpha)
-  // by the light
+  // 색상 부분(알파 제외)에만 광량 곱하기
+  gl_FragColor.rgb *= light;
   gl_FragColor.rgb *= light;
 
-  // Just add in the specular
+  // 반사율 더하기
   gl_FragColor.rgb += specular;
 }
 </script>
