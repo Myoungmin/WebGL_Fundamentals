@@ -92,6 +92,7 @@ void main() {
   float light = dot(normal, u_reverseLightDirection);
 
   vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+  // 섀도우 애크니를 없애기 위해 바이어스를 더해준다.
   float currentDepth = projectedTexcoord.z + u_bias;
 
   bool inRange =
@@ -100,7 +101,7 @@ void main() {
       projectedTexcoord.y >= 0.0 &&
       projectedTexcoord.y <= 1.0;
 
-  // the 'r' channel has the depth values
+  // 'r'채널에 깊이값이 저장되어 있습니다.
   float projectedDepth = texture2D(u_projectedTexture, projectedTexcoord.xy).r;
   float shadowLight = (inRange && projectedDepth <= currentDepth) ? 0.0 : 1.0;
 

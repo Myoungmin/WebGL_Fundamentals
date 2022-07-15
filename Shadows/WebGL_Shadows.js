@@ -9,6 +9,7 @@ function main() {
     return;
   }
 
+  // WEBGL_depth_texture 확장이 있는지 확인하고 활성화하는 코드
   const ext = gl.getExtension('WEBGL_depth_texture');
   if (!ext) {
     return alert('need WEBGL_depth_texture');  // eslint-disable-line
@@ -109,6 +110,7 @@ function main() {
 
   const depthFramebuffer = gl.createFramebuffer();
   gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
+  // 텍스처를 생성한 다음 프레임 버퍼를 생성하고, DEPTH_ATTACHMENT로 프레임 버퍼에 텍스처를 첨부
   gl.framebufferTexture2D(
       gl.FRAMEBUFFER,       // target
       gl.DEPTH_ATTACHMENT,  // attachment point
@@ -117,7 +119,6 @@ function main() {
       0);                   // mip level
 
   // create a color texture of the same size as the depth texture
-  // see article why this is needed_
   const unusedTexture = gl.createTexture();
   gl.bindTexture(gl.TEXTURE_2D, unusedTexture);
   gl.texImage2D(
@@ -137,6 +138,7 @@ function main() {
   gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 
   // attach it to the framebuffer
+  // 실제로 사용하지 않더라도 WebGL에서는 색상 텍스처를 생성하고 색상 어태치먼트로 첨부해야 한다.
   gl.framebufferTexture2D(
       gl.FRAMEBUFFER,        // target
       gl.COLOR_ATTACHMENT0,  // attachment point
@@ -265,7 +267,7 @@ function main() {
     gl.enable(gl.CULL_FACE);
     gl.enable(gl.DEPTH_TEST);
 
-    // first draw from the POV of the light
+    // 조명 시점에서 먼저 그립니다.
     const lightWorldMatrix = m4.lookAt(
         [settings.posX, settings.posY, settings.posZ],          // position
         [settings.targetX, settings.targetY, settings.targetZ], // target
@@ -285,7 +287,7 @@ function main() {
              0.5,                      // near
              10);                      // far
 
-    // draw to the depth texture
+     // 깊이 텍스처에 그립니다.
     gl.bindFramebuffer(gl.FRAMEBUFFER, depthFramebuffer);
     gl.viewport(0, 0, depthTextureSize, depthTextureSize);
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT);
@@ -297,7 +299,7 @@ function main() {
         lightWorldMatrix,
         colorProgramInfo);
 
-    // now draw scene to the canvas projecting the depth texture into the scene
+    // 이번에는 캔버스에 그리는데, 깊이 텍스처를 장면에 투영해서 그립니다.
     gl.bindFramebuffer(gl.FRAMEBUFFER, null);
     gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
     gl.clearColor(0, 0, 0, 1);
@@ -307,19 +309,18 @@ function main() {
     textureMatrix = m4.translate(textureMatrix, 0.5, 0.5, 0.5);
     textureMatrix = m4.scale(textureMatrix, 0.5, 0.5, 0.5);
     textureMatrix = m4.multiply(textureMatrix, lightProjectionMatrix);
-    // use the inverse of this world matrix to make
-    // a matrix that will transform other positions
-    // to be relative this world space.
+    // 월드 행렬의 역행렬을 사용합니다.
+    // 이렇게 하면 다른 위치 값들이 이 월드 공간에 상대적인 값이 됩니다.
     textureMatrix = m4.multiply(
         textureMatrix,
         m4.inverse(lightWorldMatrix));
 
-    // Compute the projection matrix
+    // 투영 행렬 계산
     const aspect = gl.canvas.clientWidth / gl.canvas.clientHeight;
     const projectionMatrix =
         m4.perspective(fieldOfViewRadians, aspect, 1, 2000);
 
-    // Compute the camera's matrix using look at.
+    // lookAt을 사용한 카메라 행렬 계산
     const cameraPosition = [settings.cameraX, settings.cameraY, 15];
     const target = [0, 0, 0];
     const up = [0, 1, 0];
