@@ -1,0 +1,143 @@
+<!doctype html>
+<html>
+
+<head>
+  <title>WebGL_Fundamentals</title>
+  <meta charset="utf-8">
+  <link rel="stylesheet" type="text/css" href="./WebGL_Shadows.css">
+</head>
+
+<body>
+
+  <!-- 목차 공통으로 관리하기 위해 list.html 삽입 -->
+  <!-- 출처 : https://kyung-a.tistory.com/18 -->
+  <div data-include-path="../list.html"></div>
+  <script>
+    window.addEventListener('load', function () {
+      var allElements = document.getElementsByTagName('*');
+      Array.prototype.forEach.call(allElements, function (el) {
+        var includePath = el.dataset.includePath;
+        if (includePath) {
+          var xhttp = new XMLHttpRequest();
+          xhttp.onreadystatechange = function () {
+            if (this.readyState == 4 && this.status == 200) {
+              el.outerHTML = this.responseText;
+            }
+          };
+          xhttp.open('GET', includePath, true);
+          xhttp.send();
+        }
+      });
+    });
+  </script>
+
+  <h2>WebGL Lighting : Shadows</h2>
+  <p><a href="https://myoung-min.tistory.com/172" target="_blank">학습내용 블로그 정리</a></p>
+  <canvas id="canvas"></canvas>
+<div id="uiContainer">
+  <div id="ui">
+  </div>
+</div>
+<!-- vertex shader -->
+<script  id="vertex-shader-3d" type="x-shader/x-vertex">
+attribute vec4 a_position;
+attribute vec2 a_texcoord;
+attribute vec3 a_normal;
+
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform mat4 u_world;
+uniform mat4 u_textureMatrix;
+
+varying vec2 v_texcoord;
+varying vec4 v_projectedTexcoord;
+varying vec3 v_normal;
+
+void main() {
+  // Multiply the position by the matrix.
+  vec4 worldPosition = u_world * a_position;
+
+  gl_Position = u_projection * u_view * worldPosition;
+
+  // Pass the texture coord to the fragment shader.
+  v_texcoord = a_texcoord;
+
+  v_projectedTexcoord = u_textureMatrix * worldPosition;
+
+  // orient the normals and pass to the fragment shader
+  v_normal = mat3(u_world) * a_normal;
+}
+</script>
+<!-- fragment shader -->
+<script  id="fragment-shader-3d" type="x-shader/x-fragment">
+precision mediump float;
+
+// Passed in from the vertex shader.
+varying vec2 v_texcoord;
+varying vec4 v_projectedTexcoord;
+varying vec3 v_normal;
+
+uniform vec4 u_colorMult;
+uniform sampler2D u_texture;
+uniform sampler2D u_projectedTexture;
+uniform float u_bias;
+uniform vec3 u_reverseLightDirection;
+
+void main() {
+  // because v_normal is a varying it's interpolated
+  // so it will not be a unit vector. Normalizing it
+  // will make it a unit vector again
+  vec3 normal = normalize(v_normal);
+
+  float light = dot(normal, u_reverseLightDirection);
+
+  vec3 projectedTexcoord = v_projectedTexcoord.xyz / v_projectedTexcoord.w;
+  float currentDepth = projectedTexcoord.z + u_bias;
+
+  bool inRange =
+      projectedTexcoord.x >= 0.0 &&
+      projectedTexcoord.x <= 1.0 &&
+      projectedTexcoord.y >= 0.0 &&
+      projectedTexcoord.y <= 1.0;
+
+  // the 'r' channel has the depth values
+  float projectedDepth = texture2D(u_projectedTexture, projectedTexcoord.xy).r;
+  float shadowLight = (inRange && projectedDepth <= currentDepth) ? 0.0 : 1.0;
+
+  vec4 texColor = texture2D(u_texture, v_texcoord) * u_colorMult;
+  gl_FragColor = vec4(
+      texColor.rgb * light * shadowLight,
+      texColor.a);
+}
+</script>
+<!-- vertex shader -->
+<script  id="color-vertex-shader" type="x-shader/x-vertex">
+attribute vec4 a_position;
+
+uniform mat4 u_projection;
+uniform mat4 u_view;
+uniform mat4 u_world;
+
+void main() {
+  // Multiply the position by the matrices.
+  gl_Position = u_projection * u_view * u_world * a_position;
+}
+</script>
+<!-- fragment shader -->
+<script  id="color-fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+uniform vec4 u_color;
+void main() {
+  gl_FragColor = u_color;
+}
+</script>
+
+  <script src="../webgl-utils.js"></script>
+  <script src="../webgl-lessons-ui.js"></script>
+  <script src="../m4.js"></script>
+  <script src="../primitives.js"></script>
+  <script src="./WebGL_Shadows.js"></script>
+</body>
+
+</html>
